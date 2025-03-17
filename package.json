@@ -1,0 +1,19 @@
+{
+  "name": "86-set",
+  "version": "0.0.0",
+  "description": "Module for identifying x86 instructions",
+  "main": "index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/iwl-lyam/86-set.git"
+  },
+  "author": "iwl-lyam",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/iwl-lyam/86-set/issues"
+  },
+  "homepage": "https://github.com/iwl-lyam/86-set#readme"
+}
