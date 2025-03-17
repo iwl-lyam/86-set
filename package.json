@@ -15,5 +15,6 @@
   "bugs": {
     "url": "https://github.com/iwl-lyam/86-set/issues"
   },
-  "homepage": "https://github.com/iwl-lyam/86-set#readme"
+  "homepage": "https://github.com/iwl-lyam/86-set#readme",
+  "type": "module"
 }
