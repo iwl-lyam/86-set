@@ -16,5 +16,8 @@
     "url": "https://github.com/iwl-lyam/86-set/issues"
   },
   "homepage": "https://github.com/iwl-lyam/86-set#readme",
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "html-parse-stringify": "^3.0.1"
+  }
 }

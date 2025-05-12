@@ -1,4 +1,5 @@
-import {BytecodeInstruction} from "./util"
+import {BytecodeInstruction} from "./util.ts"
+import HTML from "html-parse-stringify"
 
 /**
  * AsmToByte
@@ -6,7 +7,13 @@ import {BytecodeInstruction} from "./util"
  * @param {string} input - ASM instruction, case insensitive
  * @returns {BytecodeInstruction} Equivalent bytecode instruction (x86)
  */
-export default function AsmToByte(input: string) : BytecodeInstruction {
-       
+export default async function AsmToByte(input: string) : Promise<BytecodeInstruction> {
+    // https://www.felixcloutier.com/x86/
+    let fetched = await (await fetch("https://www.felixcloutier.com/x86/mov")).text()
+    fetched = HTML.parse(fetched)
+
     return {opcode:0,args:[]}
 }
+
+// TESTING DELETE
+AsmToByte("MOV EAX, 2")

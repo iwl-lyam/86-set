@@ -1,5 +1,5 @@
 # WIP: 86-set
-`npm` module for identifying x86 (32bit) instructions
+`npm` module for identifying x86 (32bit) instructions.
 
 - Input: `AssemblyInstruction`
 ```ts
