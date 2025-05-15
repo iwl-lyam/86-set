@@ -1,291 +1,83 @@
-import {BytecodeInstruction} from "./util.ts"
+import {AssemblyInstruction, BytecodeInstruction, identifyReference} from "./util.ts"
 import HTML from "html-parse-stringify"
 
 /**
  * AsmToByte
  * Takes in an ASM (intel) x86 instruction (e.g. MOV EAX, 42) and outputs the correspoding bytecode
  * @param {string} input - ASM instruction, case insensitive
- * @returns {BytecodeInstruction} Equivalent bytecode instruction (x86)
+ * @returns {AssemblyInstruction} Equivalent bytecode instruction (x86)
  */
-export default async function AsmToByte(input: string) : Promise<BytecodeInstruction> {
+export default async function AsmToByte(input: AssemblyInstruction) : Promise<BytecodeInstruction> {
     // https://www.felixcloutier.com/x86/
-    let fetched = await (await fetch("https://www.felixcloutier.com/x86/aaa")).text()
+    let fetched = await (await fetch("https://www.felixcloutier.com/x86/"+input.mnemonic.toLowerCase())).text()
     fetched = fetched.replace("\n", "")
     let parsed = HTML.parse(fetched)
     let body = parsed[0].children[0].children[1].children
 
     let tables: any = []
 
+
     body.forEach((table, i) => {
         if (table.name == "table") {
             tables.push({})
-            // console.log(tag)
-            /*{
-  type: "tag",
-  name: "tr",
-  voidElement: false,
-  attrs: {},
-  children: [
-    { type: "text", content: "\n" },
-    {
-      type: "tag",
-      name: "th",
-      voidElement: false,
-      attrs: {},
-      children: [ { type: "text", content: "Opcode" } ]
-    },
-    { type: "text", content: " " },
-    {
-      type: "tag",
-      name: "th",
-      voidElement: false,
-      attrs: {},
-      children: [ { type: "text", content: "Instruction" } ]
-    },
-    { type: "text", content: " " },
-    {
-      type: "tag",
-      name: "th",
-      voidElement: false,
-      attrs: {},
-      children: [ { type: "text", content: "Op/En" } ]
-    },
-    { type: "text", content: " " },
-    {
-      type: "tag",
-      name: "th",
-      voidElement: false,
-      attrs: {},
-      children: [ { type: "text", content: "64-bit Mode" } ]
-    },
-    { type: "text", content: " " },
-    {
-      type: "tag",
-      name: "th",
-      voidElement: false,
-      attrs: {},
-      children: [ { type: "text", content: "Compat/Leg Mode" } ]
-    },
-    { type: "text", content: " " },
-    {
-      type: "tag",
-      name: "th",
-      voidElement: false,
-      attrs: {},
-      children: [ { type: "text", content: "Description" } ]
-    }
-  ]
-}
-{
-  type: "tag",
-  name: "tr",
-  voidElement: false,
-  attrs: {},
-  children: [
-    { type: "text", content: "\n" },
-    {
-      type: "tag",
-      name: "td",
-      voidElement: false,
-      attrs: {},
-      children: [ { type: "text", content: "37" } ]
-    },
-    { type: "text", content: " " },
-    {
-      type: "tag",
-      name: "td",
-      voidElement: false,
-      attrs: {},
-      children: [ { type: "text", content: "AAA" } ]
-    },
-    { type: "text", content: " " },
-    {
-      type: "tag",
-      name: "td",
-      voidElement: false,
-      attrs: {},
-      children: [ { type: "text", content: "ZO" } ]
-    },
-    { type: "text", content: " " },
-    {
-      type: "tag",
-      name: "td",
-      voidElement: false,
-      attrs: {},
-      children: [ { type: "text", content: "Invalid" } ]
-    },
-    { type: "text", content: " " },
-    {
-      type: "tag",
-      name: "td",
-      voidElement: false,
-      attrs: {},
-      children: [ { type: "text", content: "Valid" } ]
-    },
-    { type: "text", content: " " },
-    {
-      type: "tag",
-      name: "td",
-      voidElement: false,
-      attrs: {},
-      children: [ { type: "text", content: "ASCII adjust AL after addition." } ]
-    }
-  ]
-}
-{
-  type: "tag",
-  name: "tr",
-  voidElement: false,
-  attrs: {},
-  children: [
-    { type: "text", content: "\n" },
-    {
-      type: "tag",
-      name: "th",
-      voidElement: false,
-      attrs: {},
-      children: [ { type: "text", content: "Op/En" } ]
-    },
-    { type: "text", content: " " },
-    {
-      type: "tag",
-      name: "th",
-      voidElement: false,
-      attrs: {},
-      children: [ { type: "text", content: "Operand 1" } ]
-    },
-    { type: "text", content: " " },
-    {
-      type: "tag",
-      name: "th",
-      voidElement: false,
-      attrs: {},
-      children: [ { type: "text", content: "Operand 2" } ]
-    },
-    { type: "text", content: " " },
-    {
-      type: "tag",
-      name: "th",
-      voidElement: false,
-      attrs: {},
-      children: [ { type: "text", content: "Operand 3" } ]
-    },
-    { type: "text", content: " " },
-    {
-      type: "tag",
-      name: "th",
-      voidElement: false,
-      attrs: {},
-      children: [ { type: "text", content: "Operand 4" } ]
-    }
-  ]
-}
-{
-  type: "tag",
-  name: "tr",
-  voidElement: false,
-  attrs: {},
-  children: [
-    { type: "text", content: "\n" },
-    {
-      type: "tag",
-      name: "td",
-      voidElement: false,
-      attrs: {},
-      children: [ { type: "text", content: "ZO" } ]
-    },
-    { type: "text", content: " " },
-    {
-      type: "tag",
-      name: "td",
-      voidElement: false,
-      attrs: {},
-      children: [ { type: "text", content: "N/A" } ]
-    },
-    { type: "text", content: " " },
-    {
-      type: "tag",
-      name: "td",
-      voidElement: false,
-      attrs: {},
-      children: [ { type: "text", content: "N/A" } ]
-    },
-    { type: "text", content: " " },
-    {
-      type: "tag",
-      name: "td",
-      voidElement: false,
-      attrs: {},
-      children: [ { type: "text", content: "N/A" } ]
-    },
-    { type: "text", content: " " },
-    {
-      type: "tag",
-      name: "td",
-      voidElement: false,
-      attrs: {},
-      children: [ { type: "text", content: "N/A" } ]
-    }
-  ]
-}
-{
-  type: "tag",
-  name: "tr",
-  voidElement: false,
-  attrs: {},
-  children: [
-    { type: "text", content: "\n" },
-    {
-      type: "tag",
-      name: "td",
-      voidElement: false,
-      attrs: {},
-      children: [ { type: "text", content: "#UD" } ]
-    },
-    { type: "text", content: " " },
-    {
-      type: "tag",
-      name: "td",
-      voidElement: false,
-      attrs: {},
-      children: [ { type: "text", content: "If the LOCK prefix is used." } ]
-    }
-  ]
-}
-{
-  type: "tag",
-  name: "tr",
-  voidElement: false,
-  attrs: {},
-  children: [
-    { type: "text", content: "\n" },
-    {
-      type: "tag",
-      name: "td",
-      voidElement: false,
-      attrs: {},
-      children: [ { type: "text", content: "#UD" } ]
-    },
-    { type: "text", content: " " },
-    {
-      type: "tag",
-      name: "td",
-      voidElement: false,
-      attrs: {},
-      children: [ { type: "text", content: "If in 64-bit mode." } ]
-    }
-  ]
-}*/
+          
+            // Ensure tables[i] is initialized
+            if (!tables[i]) tables[i] = {};
             table.children.forEach(row => {
-                if (row.name == "tr") {
-                    console.log(row)
+              if (row.name == "tr") {
+                // Find the header row (first tr with th children)
+                if (!tables[i].headers) {
+                  const headerCells = row.children.filter(child => child.name === "th");
+                  if (headerCells.length > 0) {
+                  tables[i].headers = headerCells.map(cell => cell.children[0]?.content?.trim() ?? "");
+                  tables[i].rows = [];
+                  }
+                } else {
+                  // Data row: td children
+                  const dataCells = row.children.filter(child => child.name === "td");
+                  if (dataCells.length > 0 && tables[i].headers) {
+                  const rowObj: Record<string, string> = {};
+                  dataCells.forEach((cell, idx) => {
+                    const key = tables[i].headers[idx] ?? `col${idx}`;
+                    rowObj[key] = cell.children[0]?.content?.trim() ?? "";
+                  });
+                  tables[i].rows.push(rowObj);
+                  }
                 }
+              }
             })
+            // Remove empty tables (no headers or no rows)
+            if (
+              !tables[i].headers ||
+              !tables[i].rows ||
+              tables[i].headers.length === 0 ||
+              tables[i].rows.length === 0
+            ) {
+              tables.splice(i, 1);
+            }
         }
     })
 
-    return {opcode:0,args:[]}
+    tables = tables.filter(table => Array.isArray(table.rows));
+    // console.log(tables)
+
+    const instructions = tables[0].rows
+    const format = tables[1].rows
+
+    console.log(instructions)
+
+    // identify each argument type
+    let argtypes: {}[] = []
+
+    input.args.forEach(arg => {
+        let ref = identifyReference(arg)
+        argtypes.push({ref, arg})
+    })
+
+    console.log(argtypes)
+
+    return {opcode:"",args:[]}
 }
 
 // TESTING DELETE
-AsmToByte("MOV EAX, 2")
+AsmToByte({mnemonic: "MOV", args: ["EAX", "AX"]})
