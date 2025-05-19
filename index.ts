@@ -1,4 +1,4 @@
-import {AssemblyInstruction, BytecodeInstruction, identifyReference} from "./util.ts"
+import {AssemblyInstruction, BytecodeInstruction, identifyReference, Reference, identifySize} from "./util.ts"
 import HTML from "html-parse-stringify"
 
 /**
@@ -64,13 +64,14 @@ export default async function AsmToByte(input: AssemblyInstruction) : Promise<By
     const instructions = tables[0].rows
     const format = tables[1].rows
 
-    console.log(instructions)
+    // console.log(instructions)
 
     // identify each argument type
     let argtypes: {}[] = []
 
     input.args.forEach(arg => {
         let ref = identifyReference(arg)
+        ref.size = identifySize(ref) // really bad code
         argtypes.push({ref, arg})
     })
 
@@ -80,4 +81,6 @@ export default async function AsmToByte(input: AssemblyInstruction) : Promise<By
 }
 
 // TESTING DELETE
-AsmToByte({mnemonic: "MOV", args: ["EAX", "AX"]})
+AsmToByte({mnemonic: "MOV", args: ["EAX", "120"]})
+AsmToByte({mnemonic: "MOV", args: ["AH", "0xF2"]})
+AsmToByte({mnemonic: "MOV", args: ["EBX", "0b1010110"]})
